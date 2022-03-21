@@ -1,6 +1,7 @@
 # Neko 🐈
 caviar's twin frame buffer deno module built on top of mini_fb
 
+## [Canvas API using Neko](https://github.com/load1n9/neko/tree/master/canvas)
 
 ### Usage
 
@@ -48,4 +49,6 @@ new World().start(neko, {
    }
 });
 ```
+### Maintainers
+- Loading ([@load1n9](https://github.com/load1n9))
 
