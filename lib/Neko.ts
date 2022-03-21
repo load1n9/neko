@@ -61,7 +61,7 @@ export class Neko {
     );
   }
   limitUpdateRate(micros: number) {
-    unwrap(lib.symbols.window_limit_update_rate(this.#id, micros) as number);
+    unwrap(lib.symbols.window_limit_update_rate(this.#id, micros));
   }
   setFrameBuffer(buffer: Uint8Array, width?: number, height?: number) {
     unwrap(
@@ -70,22 +70,22 @@ export class Neko {
         buffer,
         width ?? this.width,
         height ?? this.height,
-      ) as number,
+      )
     );
   }
 
   update() {
-    unwrap(lib.symbols.window_update(this.#id) as number);
+    unwrap(lib.symbols.window_update(this.#id));
   }
 
   close() {
-    unwrap(lib.symbols.window_close(this.#id) as number);
+    unwrap(lib.symbols.window_close(this.#id));
   }
   get open(): boolean {
-    return unwrapBoolean(lib.symbols.window_is_open(this.#id) as number);
+    return unwrapBoolean(lib.symbols.window_is_open(this.#id));
   }
 
   get active(): boolean {
-    return unwrapBoolean(lib.symbols.window_is_active(this.#id) as number);
+    return unwrapBoolean(lib.symbols.window_is_active(this.#id));
   }
 }
