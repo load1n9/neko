@@ -4,9 +4,11 @@ import { Canvas } from "../mod.ts";
 const COLS = 20;
 const ROWS = 20;
 const board: any = [];
+let score = 0;
 let lose = false;
 let interval: any;
 let intervalRender: any;
+let intervalRotate: any;
 let current: any;
 let currentX: number | undefined;
 let currentY: number | undefined;
@@ -60,7 +62,7 @@ function init() {
 
 function tick() {
   if (valid(0, 1)) {
-    ++currentY!;
+    (currentY!)++;
   }
   else {
     freeze();
@@ -112,7 +114,7 @@ function clearLines() {
           board[yy][x] = board[yy - 1][x];
         }
       }
-      ++y;
+      y++;
     }
   }
 }
@@ -121,17 +123,17 @@ function keyPress(key: string) {
   switch (key) {
     case "left":
       if (valid(-1)) {
-        --currentX!;
+        (currentX!)--;
       }
       break;
     case "right":
       if (valid(1)) {
-        ++currentX!;
+        (currentX!)++;
       }
       break;
     case "down":
       if (valid(0, 1)) {
-        ++currentY!;
+        (currentY!)++;
       }
       break;
     // deno-lint-ignore no-case-declarations
@@ -143,20 +145,24 @@ function keyPress(key: string) {
       break;
     case "drop":
       while (valid(0, 1)) {
-        ++currentY!;
+        (currentY!)++;
       }
       tick();
       break;
   }
 }
-
+function checkForKeyPress() {
+  if(canvas.window.isKeyDown("up")) {
+    keyPress("rotate");
+  }
+}
 function valid(offsetX = 0, offsetY = 0, newCurrent?: any) {
   offsetX = currentX! + offsetX;
   offsetY = currentY! + offsetY;
   newCurrent = newCurrent || current;
 
-  for (let y = 0; y < 4; ++y) {
-    for (let x = 0; x < 4; ++x) {
+  for (let y = 0; y < 4; y++) {
+    for (let x = 0; x < 4; x++) {
       if (newCurrent[y][x]) {
         if (
           typeof board[y + offsetY] == "undefined" ||
@@ -184,6 +190,7 @@ function playButtonClicked() {
 function newGame() {
   clearAllIntervals();
   intervalRender = setInterval(render, 30);
+  intervalRotate = setInterval(checkForKeyPress, 70);
   init();
   newShape();
   lose = false;
@@ -193,6 +200,7 @@ function newGame() {
 function clearAllIntervals() {
   clearInterval(interval);
   clearInterval(intervalRender);
+  clearInterval(intervalRotate);
 }
 
 const canvas = new Canvas({
@@ -213,7 +221,18 @@ function drawBlock(x: number, y: number) {
 
 function render() {
   ctx.clearRect(0, 0, W, H);
-
+  if(canvas.window.isKeyDown("space")) {
+    keyPress("drop");
+  }
+  if(canvas.window.isKeyDown("left")) {
+    keyPress("left");
+  }
+  if(canvas.window.isKeyDown("right")) {
+    keyPress("right");
+  }
+  if(canvas.window.isKeyDown("down")) {
+    keyPress("down");
+  }
   ctx.strokeStyle = "black";
   for (let x = 0; x < COLS; ++x) {
     for (let y = 0; y < ROWS; ++y) {
@@ -233,21 +252,6 @@ function render() {
         drawBlock(currentX! + x, currentY! + y);
       }
     }
-  }
-  if(canvas.window.isKeyDown("space")) {
-    keyPress("drop");
-  }
-  if(canvas.window.isKeyDown("left")) {
-    keyPress("left");
-  }
-  if(canvas.window.isKeyDown("right")) {
-    keyPress("right");
-  }
-  if(canvas.window.isKeyDown("down")) {
-    keyPress("down");
-  }
-  if(canvas.window.isKeyDown("up")) {
-    keyPress("rotate");
   }
 }
 playButtonClicked();
