@@ -20,6 +20,7 @@ neko's twin frame buffer deno module built on top of mini_fb with canvas api imp
 
 ## [Canvas API using Neko](https://github.com/load1n9/neko/tree/master/canvas)
 
+<img src="https://raw.githubusercontent.com/load1n9/neko/master/assets/tetris.png" width="1500rem" />
 ### Usage
 
 #### Using Methods

@@ -20,12 +20,14 @@ const lib = await Plug.prepare(options, {
     parameters: ["u32"],
     result: "u32",
   },
-
   window_is_open: {
     parameters: ["u32"],
     result: "u32",
   },
-
+  window_is_key_down: {
+    parameters: ["u32", "pointer"],
+    result: "u32",
+  },
   window_is_active: {
     parameters: ["u32"],
     result: "u32",
@@ -81,6 +83,9 @@ export class Neko {
 
   close() {
     unwrap(lib.symbols.window_close(this.#id));
+  }
+  isKeyDown(key: string): boolean {
+    return unwrapBoolean(lib.symbols.window_is_key_down(this.#id, new Uint8Array([...encode(key), 0])));
   }
   get open(): boolean {
     return unwrapBoolean(lib.symbols.window_is_open(this.#id));

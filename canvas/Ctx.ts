@@ -14,7 +14,7 @@ export class Canvas {
   #title: string;
   #ctx: CanvasRenderingContext2D;
   #canvas: EmulatedCanvas2D;
-  #window: Neko;
+  window: Neko;
   #world: World;
   #width: number;
   #height: number;
@@ -27,15 +27,15 @@ export class Canvas {
     this.#fps = config.fps || 60;
     this.#canvas = createCanvas(this.#width, this.#height);
     this.#ctx = this.#canvas.getContext("2d");
-    this.#window = new Neko({
+    this.window = new Neko({
       title: this.#title,
       width: this.#width,
       height: this.#height,
     });
-    this.#world.start(this.#window, {
+    this.#world.start(this.window, {
       fps: this.#fps,
       update: () => {
-        this.#window.setFrameBuffer(
+        this.window.setFrameBuffer(
           this.#canvas.getRawBuffer(0, 0, this.#width, this.#height),
         );
       },
