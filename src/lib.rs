@@ -14,7 +14,7 @@ thread_local! {
     static WINDOWS: RefCell<HashMap<u32, Window>> = RefCell::new(HashMap::new());
 }
 
-fn strToKeyCode(key: &str) -> Option<Key> {
+fn str_to_key_code(key: &str) -> Option<Key> {
     match key {
         "a" => Some(Key::A),
         "b" => Some(Key::B),
@@ -42,16 +42,6 @@ fn strToKeyCode(key: &str) -> Option<Key> {
         "x" => Some(Key::X),
         "y" => Some(Key::Y),
         "z" => Some(Key::Z),
-        "0" => Some(Key::D0),
-        "1" => Some(Key::D1),
-        "2" => Some(Key::D2),
-        "3" => Some(Key::D3),
-        "4" => Some(Key::D4),
-        "5" => Some(Key::D5),
-        "6" => Some(Key::D6),
-        "7" => Some(Key::D7),
-        "8" => Some(Key::D8),
-        "9" => Some(Key::D9),
         "space" => Some(Key::Space),
         "enter" => Some(Key::Enter),
         "esc" => Some(Key::Escape),
@@ -82,20 +72,25 @@ fn strToKeyCode(key: &str) -> Option<Key> {
     }
 }
 #[no_mangle]
-pub extern "C" fn window_is_key_down(id: u32, _key: *const i8) -> u32 {
-    let key = strToKeyCode(_key.to_str().unwrap());
-    WINDOWS.with(|map| {
-        let map = map.borrow();
-        if let Some(window) = map.get(&id) {
-            if window.is_key_down(key) {
-                1
+pub extern "C" fn window_is_key_down(id: u32, key: *const i8) -> u32 {
+    let key = unsafe { std::ffi::CStr::from_ptr(key) }.to_str().unwrap();
+    let key = str_to_key_code(key);
+    if let Some(key) = key {
+        WINDOWS.with(|map| {
+            let map = map.borrow();
+            if let Some(window) = map.get(&id) {
+                if window.is_key_down(key) {
+                    1
+                } else {
+                    0
+                }
             } else {
-                0
+                ERR_WINDOW_NOT_FOUND
             }
-        } else {
-            ERR_WINDOW_NOT_FOUND
-        }
-    })
+        })
+    } else {
+        0
+    }
 }
 
 #[no_mangle]
@@ -165,21 +160,7 @@ pub extern "C" fn window_is_active(id: u32) -> u32 {
         }
     })
 }
-#[no_mangle]
-pub extern "C" fn window_is_active(id: u32) -> u32 {
-    WINDOWS.with(|map| {
-        let mut map = map.borrow_mut();
-        if let Some(window) = map.get_mut(&id) {
-            if window.is_active() {
-                1
-            } else {
-                0
-            }
-        } else {
-            ERR_WINDOW_NOT_FOUND
-        }
-    })
-}
+
 
 #[no_mangle]
 pub extern "C" fn window_limit_update_rate(id: u32, ms: u64) -> u32 {
