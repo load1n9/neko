@@ -1,7 +1,7 @@
 // ported from https://github.com/AleikovStudio/Brick-breaker-game-JS-HTML-Canvas
 import { Canvas } from "../mod.ts";
 const canvas = new Canvas({
-  title: "#canvas",
+  title: "Brick Breaker",
   width: 500,
   height: 500,
 });

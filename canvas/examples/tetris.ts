@@ -4,6 +4,7 @@ import { Canvas } from "../mod.ts";
 const COLS = 20;
 const ROWS = 20;
 const board: any = [];
+// deno-lint-ignore no-unused-vars prefer-const
 let score = 0;
 let lose = false;
 let interval: any;
