@@ -5,8 +5,8 @@ import { encode, unwrap, unwrapBoolean } from "./utils.ts";
 const options: Plug.Options = {
   name: "neko",
   urls: {
-    windows: `https://github.com/load1n9/neko/raw/master/dist/neko.dll`,
-    darwin: `https://github.com/load1n9/neko/raw/master/dist/libneko.dylib` 
+    windows: `https://github.com/load1n9/neko/blob/master/dist/neko.dll?raw=true`,
+    darwin: `https://github.com/load1n9/neko/blob/master/dist/libneko.dylib?raw=true` 
   },
 };
 
