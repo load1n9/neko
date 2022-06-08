@@ -30,10 +30,10 @@ const lib = await Plug.prepare(options, {
     result: "u32",
   },
 
-  window_is_mouse_button_down: {
-    parameters: ["u32", "pointer"],
-    result: "u32",
-  },
+  // window_is_mouse_button_down: {
+  //   parameters: ["u32", "pointer"],
+  //   result: "u32",
+  // },
 
   window_is_active: {
     parameters: ["u32"],
@@ -55,20 +55,20 @@ const lib = await Plug.prepare(options, {
     result: "u32",
   },
 
-  window_get_mouse_x: {
-    parameters: ["u32"],
-    result: "f32",
-  },
+  // window_get_mouse_x: {
+  //   parameters: ["u32"],
+  //   result: "f32",
+  // },
 
-  window_get_mouse_y: {
-    parameters: ["u32"],
-    result: "f32",
-  },
+  // window_get_mouse_y: {
+  //   parameters: ["u32"],
+  //   result: "f32",
+  // },
 
-  window_get_mouse_scroll: {
-    parameters: ["u32"],
-    result: "f32",
-  },
+  // window_get_mouse_scroll: {
+  //   parameters: ["u32"],
+  //   result: "f32",
+  // },
 });
 
 
@@ -111,18 +111,18 @@ export class Neko {
     return unwrapBoolean(lib.symbols.window_is_key_down(this.#id, new Uint8Array([...encode(key), 0])));
   }
 
-  isMouseButtonDown(key: string): boolean {
-    return unwrapBoolean(lib.symbols.window_is_mouse_button_down(this.#id, new Uint8Array([...encode(key), 0])));
-  }
+  // isMouseButtonDown(key: string): boolean {
+  //   return unwrapBoolean(lib.symbols.window_is_mouse_button_down(this.#id, new Uint8Array([...encode(key), 0])));
+  // }
 
-  getScroll(): number {
-    return lib.symbols.window_get_mouse_scroll(this.#id);
-  }
+  // getScroll(): number {
+  //   return lib.symbols.window_get_mouse_scroll(this.#id);
+  // }
 
 
-  getMousePosition(): [number, number] {
-    return [lib.symbols.window_get_mouse_x(this.#id), lib.symbols.window_get_mouse_y(this.#id)];
-  }
+  // getMousePosition(): [number, number] {
+  //   return [lib.symbols.window_get_mouse_x(this.#id), lib.symbols.window_get_mouse_y(this.#id)];
+  // }
 
   get open(): boolean {
     return unwrapBoolean(lib.symbols.window_is_open(this.#id));
