@@ -19,7 +19,7 @@ export class Canvas {
   #width: number;
   #height: number;
   #fps: number;
-  constructor(config: Config = {}) {
+  constructor(config: Partial<Config> = {}) {
     this.#world = new World();
     this.#height = config.height || 200;
     this.#width = config.width || 200;
@@ -54,4 +54,3 @@ export class Canvas {
     return this.#height;
   }
 }
-export { loadImage } from "https://deno.land/x/canvas@v1.4.1/mod.ts";
