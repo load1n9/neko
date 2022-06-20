@@ -1,5 +1,5 @@
 <p align="center">
- <img src=https://raw.githubusercontent.com/load1n9/neko/master/assets/neko.png width="100rem" /> 
+ <img src=https://raw.githubusercontent.com/load1n9/neko/master/assets/logo.png width="100rem" /> 
  <br>
  <h1 align="center" >Neko 🐈</h1>
 </p>
