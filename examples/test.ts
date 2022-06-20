@@ -10,10 +10,10 @@ const neko = new Neko({
 });
 const frame = new Uint8Array(width * height * 4).fill(0x000000);
 class Instance extends World {
-    update() {
+    updateSync() {
         frame[Math.round(Math.random() * frame.length)] = Math.round(Math.random() * 0xffffff);
         neko.setFrameBuffer(frame);
     }
 }
 
-new Instance().start(neko, 60);
+new Instance().startSync(neko, 60);

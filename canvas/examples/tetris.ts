@@ -63,9 +63,8 @@ function init() {
 
 function tick() {
   if (valid(0, 1)) {
-    (currentY!)++;
-  }
-  else {
+    currentY!++;
+  } else {
     freeze();
     valid(0, 1);
     clearLines();
@@ -124,17 +123,17 @@ function keyPress(key: string) {
   switch (key) {
     case "left":
       if (valid(-1)) {
-        (currentX!)--;
+        currentX!--;
       }
       break;
     case "right":
       if (valid(1)) {
-        (currentX!)++;
+        currentX!++;
       }
       break;
     case "down":
       if (valid(0, 1)) {
-        (currentY!)++;
+        currentY!++;
       }
       break;
     // deno-lint-ignore no-case-declarations
@@ -146,14 +145,14 @@ function keyPress(key: string) {
       break;
     case "drop":
       while (valid(0, 1)) {
-        (currentY!)++;
+        currentY!++;
       }
       tick();
       break;
   }
 }
 function checkForKeyPress() {
-  if(canvas.window.isKeyDown("up")) {
+  if (canvas.window.isKeyDown("up")) {
     keyPress("rotate");
   }
 }
@@ -222,16 +221,16 @@ function drawBlock(x: number, y: number) {
 
 function render() {
   ctx.clearRect(0, 0, W, H);
-  if(canvas.window.isKeyDown("space")) {
+  if (canvas.window.isKeyDown("space")) {
     keyPress("drop");
   }
-  if(canvas.window.isKeyDown("left")) {
+  if (canvas.window.isKeyDown("left")) {
     keyPress("left");
   }
-  if(canvas.window.isKeyDown("right")) {
+  if (canvas.window.isKeyDown("right")) {
     keyPress("right");
   }
-  if(canvas.window.isKeyDown("down")) {
+  if (canvas.window.isKeyDown("down")) {
     keyPress("down");
   }
   ctx.strokeStyle = "black";

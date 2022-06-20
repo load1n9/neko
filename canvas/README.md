@@ -1,5 +1,7 @@
 # Neko Canvas 🐈
 
+<img src="https://raw.githubusercontent.com/load1n9/neko/master/assets/tetris.png" width="1500rem" />
+
 ### Usage
 
 ####  Render a red square
@@ -34,3 +36,7 @@ const img = await loadImage("https://deno.land/images/artwork/hashrock_simple.pn
 ctx.drawImage(img, 0, 0);
 ```
 <img src="https://raw.githubusercontent.com/load1n9/neko/master/assets/image.png" width="1500rem" />
+
+### Maintainers
+- Loading ([@load1n9](https://github.com/load1n9))
+

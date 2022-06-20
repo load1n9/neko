@@ -8,16 +8,16 @@ const canvas = new Canvas({
 const context = canvas.getContext("2d");
 
 let time = 0;
-let  velocity = 0.1;
+let velocity = 0.1;
 const velocityTarget = 0.1;
 // deno-lint-ignore no-explicit-any
-let  width: any
+let width: any;
 // deno-lint-ignore no-explicit-any
-let  height: any
+let height: any;
 // deno-lint-ignore no-explicit-any no-unused-vars
-let  lastX: any
+let lastX: any;
 // deno-lint-ignore no-explicit-any no-unused-vars
-let  lastY: any
+let lastY: any;
 
 const MAX_OFFSET = 400;
 const SPACING = 4;

@@ -6,7 +6,7 @@ const canvas = new Canvas({
   height: 500,
 });
 // deno-lint-ignore no-explicit-any
-let loop: any = undefined;
+let loop: any;
 const ctx = canvas.getContext("2d");
 let direction = "";
 let directionQueue = "";

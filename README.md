@@ -4,7 +4,7 @@
  <h1 align="center" >Neko 🐈</h1>
 </p>
 
-neko's twin frame buffer deno module built on top of mini_fb with canvas api implementation
+frame buffer deno module built on top of mini_fb with canvas api implementation and a webgpu renderer
 <p align="center">
   <a href="https://github.com/load1n9/neko/stargazers">
     <img alt="neko stars" src="https://img.shields.io/github/stars/load1n9/neko?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAEFCu8CAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAHKADAAQAAAABAAAAHAAAAABHddaYAAABxElEQVRIDe2Wv04CQRDGAQuoTKQ2ITyADZWVJZWV+gJYWBNqKh/C16CRBlprWxsTE2NJfABNOH9z7Gzm2Nv7A8TCOMnHzs1838ze3e4ejUbMkiRZS64lP1x8MjTFr2DQE6Gl2nI+7POARXAmdbas44ku8eLGhU9UckRliX6qxM9sQvz0vrcVaaKJKdsSNO7LOtK1kvcbaXVRu4LMz9kgKoYwBq/KLBi/yC2DQgSnBaLMQ88Tx7Q3AVkDKHpgBdoak5HrCSjuaAW/6zOz+u/Q3ZfcVrhliuaPYCAqsSJekIO/TlWbn2BveAH5JZBVUWayusZW2ClTuPzMi6xTIp5abuBHxHLcZSyzkxHF1uNJRrV9gXBhOl7h6wFW/FqcaGILEmsDWfg9G//3858Az0lWaHhm5dP3i9JoDtTm+1UrUdMl72OZv10itfx3zOYpLAv/FPQNLvFj35Bnco/gzeCD72H6b4JYaDTpgidwaJOa3bCji5BsgYcDdJUamSMi2lQTCEbgu0Zz4Y5UX3tE3K/RTKny3qNWdst3UWU8sYtmU40py2Go9o5zC460l/guJjm1leZrjaiH4B4cVxUK12mGVTV/j/cDqcFClUX01ZEAAAAASUVORK5CYII=" />
@@ -18,9 +18,13 @@ neko's twin frame buffer deno module built on top of mini_fb with canvas api imp
  </p>
 <hr/>
 
-## [Canvas API using Neko](https://github.com/load1n9/neko/tree/master/canvas)
+### Packages 
+* [Core](https://github.com/load1n9/neko/tree/master/core) - basic frame buffer library
+* [Canvas](https://github.com/load1n9/neko/tree/master/canvas) - javascript canvas implementation 
+* [WebGPU](https://github.com/load1n9/neko/tree/master/webgpu) - webgpu renderer
 
-<img src="https://raw.githubusercontent.com/load1n9/neko/master/assets/tetris.png" width="1500rem" />
+
+
 ### Usage
 
 #### Using Methods

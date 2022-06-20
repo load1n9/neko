@@ -5,9 +5,12 @@ import { encode, unwrap, unwrapBoolean } from "./utils.ts";
 const options: Plug.Options = {
   name: "neko",
   urls: {
-    windows: `https://github.com/load1n9/neko/blob/master/dist/neko.dll?raw=true`,
-    darwin: `https://github.com/load1n9/neko/blob/master/dist/libneko.dylib?raw=true`,
-    linux: `https://github.com/load1n9/neko/blob/master/dist/libneko.so?raw=true` 
+    windows:
+      `https://github.com/load1n9/neko/blob/master/dist/neko.dll?raw=true`,
+    darwin:
+      `https://github.com/load1n9/neko/blob/master/dist/libneko.dylib?raw=true`,
+    linux:
+      `https://github.com/load1n9/neko/blob/master/dist/libneko.so?raw=true`,
   },
 };
 
@@ -54,7 +57,6 @@ const lib = await Plug.prepare(options, {
     parameters: ["u32"],
     result: "u32",
   },
-
   // window_get_mouse_x: {
   //   parameters: ["u32"],
   //   result: "f32",
@@ -71,18 +73,17 @@ const lib = await Plug.prepare(options, {
   // },
 });
 
-
 export class Neko {
   #id;
   width: number;
   height: number;
   constructor(options: NekoOptions) {
-    this.width = options.width;
-    this.height = options.height;
+    this.width = options.width ?? 800;
+    this.height = options.height ?? 600;
     this.#id = lib.symbols.window_new(
-      new Uint8Array([...encode(options.title), 0]),
-      options.width,
-      options.height,
+      new Uint8Array([...encode(options.title ?? "Neko"), 0]),
+      this.width,
+      this.height,
     );
   }
   limitUpdateRate(micros: number) {
@@ -95,7 +96,7 @@ export class Neko {
         buffer,
         width ?? this.width,
         height ?? this.height,
-      )
+      ),
     );
   }
 
@@ -108,7 +109,12 @@ export class Neko {
   }
 
   isKeyDown(key: string): boolean {
-    return unwrapBoolean(lib.symbols.window_is_key_down(this.#id, new Uint8Array([...encode(key), 0])));
+    return unwrapBoolean(
+      lib.symbols.window_is_key_down(
+        this.#id,
+        new Uint8Array([...encode(key), 0]),
+      ),
+    );
   }
 
   // isMouseButtonDown(key: string): boolean {
@@ -118,7 +124,6 @@ export class Neko {
   // getScroll(): number {
   //   return lib.symbols.window_get_mouse_scroll(this.#id);
   // }
-
 
   // getMousePosition(): [number, number] {
   //   return [lib.symbols.window_get_mouse_x(this.#id), lib.symbols.window_get_mouse_y(this.#id)];
