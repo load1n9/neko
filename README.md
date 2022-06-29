@@ -1,10 +1,12 @@
 <p align="center">
- <img src=https://raw.githubusercontent.com/load1n9/neko/master/assets/logo.png width="100rem" /> 
+ <img src=https://raw.githubusercontent.com/load1n9/neko/master/assets/logo.png width="100rem" />
  <br>
  <h1 align="center" >Neko 🐈</h1>
 </p>
 
-frame buffer deno module built on top of mini_fb with canvas api implementation and a webgpu renderer
+frame buffer deno module built on top of mini_fb with canvas api implementation
+and a webgpu renderer
+
 <p align="center">
   <a href="https://github.com/load1n9/neko/stargazers">
     <img alt="neko stars" src="https://img.shields.io/github/stars/load1n9/neko?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAEFCu8CAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAHKADAAQAAAABAAAAHAAAAABHddaYAAABxElEQVRIDe2Wv04CQRDGAQuoTKQ2ITyADZWVJZWV+gJYWBNqKh/C16CRBlprWxsTE2NJfABNOH9z7Gzm2Nv7A8TCOMnHzs1838ze3e4ejUbMkiRZS64lP1x8MjTFr2DQE6Gl2nI+7POARXAmdbas44ku8eLGhU9UckRliX6qxM9sQvz0vrcVaaKJKdsSNO7LOtK1kvcbaXVRu4LMz9kgKoYwBq/KLBi/yC2DQgSnBaLMQ88Tx7Q3AVkDKHpgBdoak5HrCSjuaAW/6zOz+u/Q3ZfcVrhliuaPYCAqsSJekIO/TlWbn2BveAH5JZBVUWayusZW2ClTuPzMi6xTIp5abuBHxHLcZSyzkxHF1uNJRrV9gXBhOl7h6wFW/FqcaGILEmsDWfg9G//3858Az0lWaHhm5dP3i9JoDtTm+1UrUdMl72OZv10itfx3zOYpLAv/FPQNLvFj35Bnco/gzeCD72H6b4JYaDTpgidwaJOa3bCji5BsgYcDdJUamSMi2lQTCEbgu0Zz4Y5UX3tE3K/RTKny3qNWdst3UWU8sYtmU40py2Go9o5zC460l/guJjm1leZrjaiH4B4cVxUK12mGVTV/j/cDqcFClUX01ZEAAAAASUVORK5CYII=" />
@@ -18,59 +20,67 @@ frame buffer deno module built on top of mini_fb with canvas api implementation 
  </p>
 <hr/>
 
-### Packages 
-* [Core](https://github.com/load1n9/neko/tree/master/core) - basic frame buffer library
-* [Canvas](https://github.com/load1n9/neko/tree/master/canvas) - javascript canvas implementation 
-* [WebGPU](https://github.com/load1n9/neko/tree/master/webgpu) - webgpu renderer
+### Packages
 
-
+- [Core](https://github.com/load1n9/neko/tree/master/core) - basic frame buffer
+  library
+- [Canvas](https://github.com/load1n9/neko/tree/master/canvas) - javascript
+  canvas implementation
+- [WebGPU](https://github.com/load1n9/neko/tree/master/webgpu) - webgpu renderer
 
 ### Usage
 
 #### Using Methods
 
 ```typescript
-import { World, Neko } from "https://deno.land/x/neko/mod.ts";
+import { Neko, World } from "https://deno.land/x/neko/mod.ts";
 
 const width = 800;
 const height = 600;
 
 const neko = new Neko({
-    title: "Neko",
-    width,
-    height,
+  title: "Neko",
+  width,
+  height,
 });
 const frame = new Uint8Array(width * height * 4).fill(0x000000);
 class Instance extends World {
-    update() {
-        frame[Math.round(Math.random() * frame.length)] = Math.round(Math.random() * 0xffffff);
-        neko.setFrameBuffer(frame);
-    }
+  updateSync() {
+    frame[Math.round(Math.random() * frame.length)] = Math.round(
+      Math.random() * 0xffffff,
+    );
+    neko.setFrameBuffer(frame);
+  }
 }
 
-new Instance().start(neko, 60);
+new Instance().startSync(neko, 60);
 ```
+
 #### Using Functions
+
 ```typescript
-import { World, Neko } from "https://deno.land/x/neko/mod.ts";
+import { Neko, World } from "https://deno.land/x/neko/mod.ts";
 
 const width = 800;
 const height = 600;
 
 const neko = new Neko({
-    title: "Neko",
-    width,
-    height,
+  title: "Neko",
+  width,
+  height,
 });
 const frame = new Uint8Array(width * height * 4).fill(0x000000);
-new World().start(neko, {
+new World().startSync(neko, {
   fps: 60,
-  update: () => {
-        frame[Math.round(Math.random() * frame.length)] = Math.round(Math.random() * 0xffffff);
-        neko.setFrameBuffer(frame);
-   }
+  updateSync: () => {
+    frame[Math.round(Math.random() * frame.length)] = Math.round(
+      Math.random() * 0xffffff,
+    );
+    neko.setFrameBuffer(frame);
+  },
 });
 ```
-### Maintainers
-- Loading ([@load1n9](https://github.com/load1n9))
 
+### Maintainers
+
+- Loading ([@load1n9](https://github.com/load1n9))

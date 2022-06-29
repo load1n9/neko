@@ -1,4 +1,5 @@
-export const encode = (str: string): Uint8Array => new TextEncoder().encode(str);
+export const encode = (str: string | Uint8Array): Uint8Array =>
+  typeof str === "string" ? new TextEncoder().encode(str) : str;
 
 const ERROR_CODES: {
   [code: number]: string | undefined;
@@ -18,7 +19,8 @@ export function unwrapBoolean(result: number): boolean {
   if (result !== 0 && result !== 1) {
     unwrap(result);
     return false;
-  } else {
-    return result === 1;
   }
+  return result === 1;
 }
+
+export const wrapBoolean = (value: boolean): number => (value ? 1 : 0);
