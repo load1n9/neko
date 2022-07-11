@@ -87,6 +87,18 @@ const lib = await Plug.prepare(options, {
     parameters: ["u32"],
     result: "f32",
   },
+  menu_new: {
+    parameters: ["pointer"],
+    result: "u32",
+  },
+  menu_add_item: {
+    parameters: ["u32", "pointer", "u32", "pointer"],
+    result: "u32",
+  },
+  window_add_menu: {
+    parameters: ["u32", "u32"],
+    result: "u32",
+  },
 });
 
 export class Neko {
@@ -154,6 +166,10 @@ export class Neko {
     unwrap(lib.symbols.window_close(this.#id));
   }
 
+  addMenu(menu: Menu) {
+    unwrap(lib.symbols.window_add_menu(this.#id, menu.id));
+  }
+
   isKeyDown(key: string): boolean {
     return unwrapBoolean(
       lib.symbols.window_is_key_down(
@@ -197,5 +213,22 @@ export class Neko {
 
   get active(): boolean {
     return unwrapBoolean(lib.symbols.window_is_active(this.#id));
+  }
+}
+
+export class Menu {
+  id: number;
+  constructor(title: string) {
+    this.id = lib.symbols.window_new(
+      new Uint8Array([...encode(title), 0]),
+    );
+  }
+  addItem(title: string) {
+    unwrap(
+      lib.symbols.menu_add_item(
+        this.id,
+        new Uint8Array([...encode(title), 0]),
+      ),
+    );
   }
 }

@@ -1,6 +1,6 @@
 // based on https://github.com/konsumer/deno-minifb/blob/main/src/lib.rs
 extern crate minifb;
-use minifb::{Icon, Key, MouseButton, MouseMode, Window, WindowOptions};
+use minifb::{Icon, Key, Menu, MouseButton, MouseMode, Window, WindowOptions};
 use std::cell::RefCell;
 use std::collections::HashMap;
 #[cfg(target_os = "linux")]
@@ -14,6 +14,7 @@ pub static ERR_UPDATE_WITH_BUFFER_FAILED: u32 = 3;
 
 thread_local! {
     static WINDOWS: RefCell<HashMap<u32, Window>> = RefCell::new(HashMap::new());
+    static MENUS: RefCell<HashMap<u32,  Menu>> = RefCell::new(HashMap::new());
 }
 
 fn str_to_mousekey_code(key: &str) -> Option<MouseButton> {
@@ -418,6 +419,59 @@ pub extern "C" fn window_update(id: u32) -> u32 {
         if let Some(window) = map.get_mut(&id) {
             window.update();
             SUCCESS
+        } else {
+            ERR_WINDOW_NOT_FOUND
+        }
+    })
+}
+
+#[no_mangle]
+pub extern "C" fn menu_new(title: *const i8) -> u32 {
+    MENUS.with(|map| {
+        let mut map = map.borrow_mut();
+        let mut id = 0u32;
+        while map.contains_key(&id) {
+            id += 1;
+        }
+        let title = unsafe { std::ffi::CStr::from_ptr(title) };
+        let menu = Menu::new(title.to_str().unwrap()).unwrap();
+        map.insert(id, menu);
+        id
+    })
+}
+
+#[no_mangle]
+pub extern "C" fn menu_add_item(id: u32, title: *const i8, item_id: u32, key: *const i8) -> u32 {
+    MENUS.with(|map| {
+        let mut map = map.borrow_mut();
+        if let Some(menu) = map.get_mut(&id) {
+            let title = unsafe { std::ffi::CStr::from_ptr(title) };
+            let title = title.to_str().unwrap();
+            let key = unsafe { std::ffi::CStr::from_ptr(key) };
+            let key = key.to_str().unwrap();
+            menu.add_item(title, item_id.try_into().unwrap())
+                .shortcut(str_to_key_code(key).unwrap(), 0)
+                .build();
+            SUCCESS
+        } else {
+            ERR_WINDOW_NOT_FOUND
+        }
+    })
+}
+#[no_mangle]
+pub extern "C" fn window_add_menu(id: u32, menu_id: u32) -> u32 {
+    WINDOWS.with(|map| {
+        let mut map = map.borrow_mut();
+        if let Some(window) = map.get_mut(&id) {
+            MENUS.with(|map| {
+                let mut map = map.borrow_mut();
+                if let Some(menu) = map.get_mut(&menu_id) {
+                    window.add_menu(menu);
+                    SUCCESS
+                } else {
+                    ERR_WINDOW_NOT_FOUND
+                }
+            })
         } else {
             ERR_WINDOW_NOT_FOUND
         }
