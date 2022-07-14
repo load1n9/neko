@@ -19,14 +19,7 @@ function readPointer(v: any): Uint8Array {
 }
 const opts = {
   name: "neko",
-  urls: {
-    windows:
-      `https://github.com/load1n9/neko/blob/master/dist/neko.dll?raw=true`,
-    darwin:
-      `https://github.com/load1n9/neko/blob/master/dist/libneko.dylib?raw=true`,
-    linux:
-      `https://github.com/load1n9/neko/blob/master/dist/libneko.so?raw=true`,
-  },
+  url: (new URL("../dist", import.meta.url)).toString(),
   policy: CachePolicy.NONE,
 };
 const _lib = await prepare(opts, {
