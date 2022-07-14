@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 minifb = "0.23.0"
+deno_bindgen = "0.5.1"
 
 [lib]
 crate-type = ["cdylib"]

@@ -1,5 +1,6 @@
 // based on https://github.com/konsumer/deno-minifb/blob/main/src/lib.rs
 extern crate minifb;
+use deno_bindgen::deno_bindgen;
 use minifb::{Icon, Key, Menu, MouseButton, MouseMode, Window, WindowOptions};
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -139,9 +140,8 @@ fn str_to_key_code(key: &str) -> Option<Key> {
     }
 }
 
-#[no_mangle]
-pub extern "C" fn window_is_key_down(id: u32, key: *const i8) -> u32 {
-    let key = unsafe { std::ffi::CStr::from_ptr(key) }.to_str().unwrap();
+#[deno_bindgen]
+pub fn window_is_key_down(id: u32, key: &str) -> u32 {
     let key = str_to_key_code(key);
     if let Some(key) = key {
         WINDOWS.with(|map| {
@@ -161,9 +161,8 @@ pub extern "C" fn window_is_key_down(id: u32, key: *const i8) -> u32 {
     }
 }
 
-#[no_mangle]
-pub extern "C" fn window_is_mouse_button_down(id: u32, key: *const i8) -> u32 {
-    let key = unsafe { std::ffi::CStr::from_ptr(key) }.to_str().unwrap();
+#[deno_bindgen]
+pub fn window_is_mouse_button_down(id: u32, key: &str) -> u32 {
     let key = str_to_mousekey_code(key);
     if let Some(key) = key {
         WINDOWS.with(|map| {
@@ -183,8 +182,8 @@ pub extern "C" fn window_is_mouse_button_down(id: u32, key: *const i8) -> u32 {
     }
 }
 
-#[no_mangle]
-pub extern "C" fn window_get_mouse_x(id: u32) -> f32 {
+#[deno_bindgen]
+pub fn window_get_mouse_x(id: u32) -> f32 {
     WINDOWS.with(|map| {
         let map = map.borrow();
         if let Some(window) = map.get(&id) {
@@ -199,8 +198,8 @@ pub extern "C" fn window_get_mouse_x(id: u32) -> f32 {
     })
 }
 
-#[no_mangle]
-pub extern "C" fn window_get_mouse_y(id: u32) -> f32 {
+#[deno_bindgen]
+pub fn window_get_mouse_y(id: u32) -> f32 {
     WINDOWS.with(|map| {
         let map = map.borrow();
         if let Some(window) = map.get(&id) {
@@ -215,8 +214,8 @@ pub extern "C" fn window_get_mouse_y(id: u32) -> f32 {
     })
 }
 
-#[no_mangle]
-pub extern "C" fn window_get_mouse_scroll(id: u32) -> f32 {
+#[deno_bindgen]
+pub fn window_get_mouse_scroll(id: u32) -> f32 {
     WINDOWS.with(|map| {
         let map = map.borrow();
         if let Some(window) = map.get(&id) {
@@ -231,9 +230,9 @@ pub extern "C" fn window_get_mouse_scroll(id: u32) -> f32 {
     })
 }
 
-#[no_mangle]
-pub extern "C" fn window_new(
-    title: *const i8,
+#[deno_bindgen]
+pub fn window_new(
+    title: &str,
     width: usize,
     height: usize,
     resize: i32,
@@ -248,9 +247,8 @@ pub extern "C" fn window_new(
             id += 1;
         }
 
-        let title = unsafe { std::ffi::CStr::from_ptr(title) };
         let window = Window::new(
-            title.to_str().unwrap(),
+            title,
             width,
             height,
             WindowOptions {
@@ -268,13 +266,12 @@ pub extern "C" fn window_new(
     })
 }
 
-#[no_mangle]
-pub extern "C" fn window_set_icon_path(id: u32, path: *const i8) -> u32 {
+#[deno_bindgen]
+pub fn window_set_icon_path(id: u32, path: &str) -> u32 {
     WINDOWS.with(|map| {
         let mut map = map.borrow_mut();
         if let Some(window) = map.get_mut(&id) {
-            let path = unsafe { std::ffi::CStr::from_ptr(path) };
-            let path = path.to_str().unwrap();
+            let path = path;
             #[cfg(target_os = "windows")]
             window.set_icon(Icon::from_str(path).unwrap());
             SUCCESS
@@ -284,13 +281,11 @@ pub extern "C" fn window_set_icon_path(id: u32, path: *const i8) -> u32 {
     })
 }
 
-#[no_mangle]
-pub extern "C" fn window_set_title(id: u32, title: *const i8) -> u32 {
+#[deno_bindgen]
+pub fn window_set_title(id: u32, title: &str) -> u32 {
     WINDOWS.with(|map| {
         let mut map = map.borrow_mut();
         if let Some(window) = map.get_mut(&id) {
-            let title = unsafe { std::ffi::CStr::from_ptr(title) };
-            let title = title.to_str().unwrap();
             window.set_title(title);
             SUCCESS
         } else {
@@ -299,8 +294,8 @@ pub extern "C" fn window_set_title(id: u32, title: *const i8) -> u32 {
     })
 }
 
-#[no_mangle]
-pub extern "C" fn window_set_background_color(id: u32, r: usize, g: usize, b: usize) -> u32 {
+#[deno_bindgen]
+pub fn window_set_background_color(id: u32, r: usize, g: usize, b: usize) -> u32 {
     WINDOWS.with(|map| {
         let mut map = map.borrow_mut();
         if let Some(window) = map.get_mut(&id) {
@@ -312,8 +307,8 @@ pub extern "C" fn window_set_background_color(id: u32, r: usize, g: usize, b: us
     })
 }
 
-#[no_mangle]
-pub extern "C" fn window_close(id: u32) -> u32 {
+#[deno_bindgen]
+pub fn window_close(id: u32) -> u32 {
     WINDOWS.with(|map| {
         let mut map = map.borrow_mut();
 
@@ -326,8 +321,8 @@ pub extern "C" fn window_close(id: u32) -> u32 {
     })
 }
 
-#[no_mangle]
-pub extern "C" fn window_is_open(id: u32) -> u32 {
+#[deno_bindgen]
+pub fn window_is_open(id: u32) -> u32 {
     WINDOWS.with(|map| {
         let map = map.borrow();
         if let Some(window) = map.get(&id) {
@@ -342,8 +337,8 @@ pub extern "C" fn window_is_open(id: u32) -> u32 {
     })
 }
 
-#[no_mangle]
-pub extern "C" fn window_is_active(id: u32) -> u32 {
+#[deno_bindgen]
+pub fn window_is_active(id: u32) -> u32 {
     WINDOWS.with(|map| {
         let mut map = map.borrow_mut();
         if let Some(window) = map.get_mut(&id) {
@@ -358,8 +353,8 @@ pub extern "C" fn window_is_active(id: u32) -> u32 {
     })
 }
 
-#[no_mangle]
-pub extern "C" fn window_limit_update_rate(id: u32, ms: u64) -> u32 {
+#[deno_bindgen]
+pub fn window_limit_update_rate(id: u32, ms: u64) -> u32 {
     WINDOWS.with(|map| {
         let mut map = map.borrow_mut();
 
@@ -376,18 +371,13 @@ pub extern "C" fn window_limit_update_rate(id: u32, ms: u64) -> u32 {
     })
 }
 
-#[no_mangle]
-pub extern "C" fn window_update_with_buffer(
-    id: u32,
-    buffer: *const u8,
-    width: usize,
-    height: usize,
-) -> u32 {
+#[deno_bindgen]
+pub fn window_update_with_buffer(id: u32, buffer: &[u8], width: usize, height: usize) -> u32 {
     WINDOWS.with(|map| {
         let mut map = map.borrow_mut();
 
         if let Some(window) = map.get_mut(&id) {
-            let bufu8: &[u8] = unsafe { std::slice::from_raw_parts(buffer, width * height * 4) };
+            let bufu8: &[u8] = buffer;
             let mut buffer = vec![0u32; width * height];
 
             let mut idx = 0;
@@ -411,8 +401,8 @@ pub extern "C" fn window_update_with_buffer(
     })
 }
 
-#[no_mangle]
-pub extern "C" fn window_update(id: u32) -> u32 {
+#[deno_bindgen]
+pub fn window_update(id: u32) -> u32 {
     WINDOWS.with(|map| {
         let mut map = map.borrow_mut();
 
@@ -425,30 +415,25 @@ pub extern "C" fn window_update(id: u32) -> u32 {
     })
 }
 
-#[no_mangle]
-pub extern "C" fn menu_new(title: *const i8) -> u32 {
+#[deno_bindgen]
+pub fn menu_new(title: &str) -> u32 {
     MENUS.with(|map| {
         let mut map = map.borrow_mut();
         let mut id = 0u32;
         while map.contains_key(&id) {
             id += 1;
         }
-        let title = unsafe { std::ffi::CStr::from_ptr(title) };
-        let menu = Menu::new(title.to_str().unwrap()).unwrap();
+        let menu = Menu::new(title).unwrap();
         map.insert(id, menu);
         id
     })
 }
 
-#[no_mangle]
-pub extern "C" fn menu_add_item(id: u32, title: *const i8, item_id: u32, key: *const i8) -> u32 {
+#[deno_bindgen]
+pub fn menu_add_item(id: u32, title: &str, item_id: u32, key: &str) -> u32 {
     MENUS.with(|map| {
         let mut map = map.borrow_mut();
         if let Some(menu) = map.get_mut(&id) {
-            let title = unsafe { std::ffi::CStr::from_ptr(title) };
-            let title = title.to_str().unwrap();
-            let key = unsafe { std::ffi::CStr::from_ptr(key) };
-            let key = key.to_str().unwrap();
             menu.add_item(title, item_id.try_into().unwrap())
                 .shortcut(str_to_key_code(key).unwrap(), 0)
                 .build();
@@ -458,8 +443,8 @@ pub extern "C" fn menu_add_item(id: u32, title: *const i8, item_id: u32, key: *c
         }
     })
 }
-#[no_mangle]
-pub extern "C" fn window_add_menu(id: u32, menu_id: u32) -> u32 {
+#[deno_bindgen]
+pub fn window_add_menu(id: u32, menu_id: u32) -> u32 {
     WINDOWS.with(|map| {
         let mut map = map.borrow_mut();
         if let Some(window) = map.get_mut(&id) {

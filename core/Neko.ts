@@ -1,106 +1,7 @@
-import { Plug } from "https://deno.land/x/plug@0.5.1/mod.ts";
+// import { Plug } from "https://deno.land/x/plug@0.5.1/mod.ts";
 import { NekoOptions } from "./types.ts";
-import { encode, unwrap, unwrapBoolean, wrapBoolean } from "./utils.ts";
-
-const options: Plug.Options = {
-  name: "neko",
-  urls: {
-    windows:
-      `https://github.com/load1n9/neko/blob/master/dist/neko.dll?raw=true`,
-    darwin:
-      `https://github.com/load1n9/neko/blob/master/dist/libneko.dylib?raw=true`,
-    linux:
-      `https://github.com/load1n9/neko/blob/master/dist/libneko.so?raw=true`,
-  },
-};
-
-const lib = await Plug.prepare(options, {
-  window_new: {
-    parameters: ["pointer", "usize", "usize", "i32", "i32", "i32", "i32"],
-    result: "u32",
-  },
-  window_set_icon_path: {
-    parameters: ["u32", "pointer"],
-    result: "i32",
-  },
-  window_close: {
-    parameters: ["u32"],
-    result: "u32",
-  },
-
-  window_is_open: {
-    parameters: ["u32"],
-    result: "u32",
-  },
-
-  window_is_key_down: {
-    parameters: ["u32", "pointer"],
-    result: "u32",
-  },
-
-  window_is_mouse_button_down: {
-    parameters: ["u32", "pointer"],
-    result: "u32",
-  },
-
-  window_is_active: {
-    parameters: ["u32"],
-    result: "u32",
-  },
-
-  window_limit_update_rate: {
-    parameters: ["u32", "u64"],
-    result: "u32",
-  },
-
-  window_update_with_buffer: {
-    parameters: ["u32", "pointer", "usize", "usize"],
-    result: "u32",
-  },
-
-  window_update: {
-    parameters: ["u32"],
-    result: "u32",
-  },
-
-  window_set_title: {
-    parameters: ["u32", "pointer"],
-    result: "u32",
-  },
-
-  window_set_background_color: {
-    parameters: ["u32", "usize", "usize", "usize"],
-    result: "u32",
-  },
-
-  window_get_mouse_x: {
-    parameters: ["u32"],
-    result: "f32",
-  },
-
-  window_get_mouse_y: {
-    parameters: ["u32"],
-    result: "f32",
-  },
-
-  window_get_mouse_scroll: {
-    parameters: ["u32"],
-    result: "f32",
-  },
-  menu_new: {
-    parameters: ["pointer"],
-    result: "u32",
-  },
-  menu_add_item: {
-    parameters: ["u32", "pointer", "u32", "pointer"],
-    result: "u32",
-  },
-  window_add_menu: {
-    parameters: ["u32", "u32"],
-    result: "u32",
-  },
-});
-
+import * as bindings from "../bindings/bindings.ts";
+import { unwrap, unwrapBoolean, wrapBoolean } from "./utils.ts";
 export class Neko {
   #id;
   width: number;
@@ -108,8 +9,8 @@ export class Neko {
   constructor(options: NekoOptions) {
     this.width = options.width ?? 800;
     this.height = options.height ?? 600;
-    this.#id = lib.symbols.window_new(
-      new Uint8Array([...encode(options.title ?? "Neko"), 0]),
+    this.#id = bindings.window_new(
+      options.title ?? "Neko",
       this.width,
       this.height,
       wrapBoolean(options.resize ?? false),
@@ -123,33 +24,33 @@ export class Neko {
 
   setIcon(path: string) {
     unwrap(
-      lib.symbols.window_set_icon_path(
+      bindings.window_set_icon_path(
         this.#id,
-        new Uint8Array([...encode(path), 0]),
+        path,
       ),
     );
   }
 
   setTitle(title: string) {
     unwrap(
-      lib.symbols.window_set_title(
+      bindings.window_set_title(
         this.#id,
-        new Uint8Array([...encode(title), 0]),
+        title,
       ),
     );
   }
 
   setBackgroundColor(r: number, g: number, b: number) {
-    unwrap(lib.symbols.window_set_background_color(this.#id, r, g, b));
+    unwrap(bindings.window_set_background_color(this.#id, r, g, b));
   }
 
   limitUpdateRate(micros: number) {
-    unwrap(lib.symbols.window_limit_update_rate(this.#id, micros));
+    unwrap(bindings.window_limit_update_rate(this.#id, micros));
   }
 
   setFrameBuffer(buffer: Uint8Array, width?: number, height?: number) {
     unwrap(
-      lib.symbols.window_update_with_buffer(
+      bindings.window_update_with_buffer(
         this.#id,
         buffer,
         width ?? this.width,
@@ -159,76 +60,80 @@ export class Neko {
   }
 
   update() {
-    unwrap(lib.symbols.window_update(this.#id));
+    unwrap(bindings.window_update(this.#id));
   }
 
   close() {
-    unwrap(lib.symbols.window_close(this.#id));
+    unwrap(bindings.window_close(this.#id));
   }
 
   addMenu(menu: Menu) {
-    unwrap(lib.symbols.window_add_menu(this.#id, menu.id));
+    unwrap(bindings.window_add_menu(this.#id, menu.id));
   }
 
   isKeyDown(key: string): boolean {
     return unwrapBoolean(
-      lib.symbols.window_is_key_down(
+      bindings.window_is_key_down(
         this.#id,
-        new Uint8Array([...encode(key), 0]),
+        key,
       ),
     );
   }
 
   isMouseButtonDown(key: string): boolean {
     return unwrapBoolean(
-      lib.symbols.window_is_mouse_button_down(
+      bindings.window_is_mouse_button_down(
         this.#id,
-        new Uint8Array([...encode(key), 0]),
+        key,
       ),
     );
   }
 
   get scroll(): number {
-    return lib.symbols.window_get_mouse_scroll(this.#id);
+    return bindings.window_get_mouse_scroll(this.#id);
   }
 
   get mousePosition(): [number, number] {
     return [
-      lib.symbols.window_get_mouse_x(this.#id),
-      lib.symbols.window_get_mouse_y(this.#id),
+      bindings.window_get_mouse_x(this.#id),
+      bindings.window_get_mouse_y(this.#id),
     ];
   }
 
   get mouseX(): number {
-    return lib.symbols.window_get_mouse_x(this.#id);
+    return bindings.window_get_mouse_x(this.#id);
   }
 
   get mouseY(): number {
-    return lib.symbols.window_get_mouse_y(this.#id);
+    return bindings.window_get_mouse_y(this.#id);
   }
 
   get open(): boolean {
-    return unwrapBoolean(lib.symbols.window_is_open(this.#id));
+    return unwrapBoolean(bindings.window_is_open(this.#id));
   }
 
   get active(): boolean {
-    return unwrapBoolean(lib.symbols.window_is_active(this.#id));
+    return unwrapBoolean(bindings.window_is_active(this.#id));
   }
 }
 
 export class Menu {
   id: number;
+  itemIndex = 0;
   constructor(title: string) {
-    this.id = lib.symbols.window_new(
-      new Uint8Array([...encode(title), 0]),
+    this.id = bindings.menu_new(
+      title,
     );
   }
-  addItem(title: string) {
+  addItem(title: string, key: string) {
     unwrap(
-      lib.symbols.menu_add_item(
+      bindings.menu_add_item(
         this.id,
-        new Uint8Array([...encode(title), 0]),
+        title,
+        this.itemIndex,
+        key,
       ),
     );
+    this.itemIndex++;
   }
 }
