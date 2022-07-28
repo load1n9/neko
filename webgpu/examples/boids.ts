@@ -1,7 +1,7 @@
 // ported from https://github.com/denoland/webgpu-examples/blob/main/boids/mod.ts
-import { GPUWorld } from "../mod.ts";
-import { createBufferInit } from "../utils.ts";
-import type { Dimensions } from "../types.ts";
+import { GPUWorld } from "https://deno.land/x/neko@1.1.0/webgpu/mod.ts";
+import { createBufferInit } from "https://deno.land/x/neko@1.1.0/webgpu/utils.ts";
+import type { Dimensions } from "https://deno.land/x/neko@1.1.0/webgpu/types.ts";
 
 class Boids extends GPUWorld {
   particleCount: number;
@@ -31,39 +31,36 @@ class Boids extends GPUWorld {
     const computeShader = this.device.createShaderModule({
       code: `
       struct Particle {
-        pos : vec2<f32>;
-        vel : vec2<f32>;
+        pos : vec2<f32>,
+        vel : vec2<f32>,
       };
       
       struct SimParams {
-        deltaT : f32;
-        rule1Distance : f32;
-        rule2Distance : f32;
-        rule3Distance : f32;
-        rule1Scale : f32;
-        rule2Scale : f32;
-        rule3Scale : f32;
+        deltaT : f32,
+        rule1Distance : f32,
+        rule2Distance : f32,
+        rule3Distance : f32,
+        rule1Scale : f32,
+        rule2Scale : f32,
+        rule3Scale : f32,
       };
       
-      struct Particles {
-        particles : [[stride(16)]] array<Particle>;
-      };
-      
-      [[group(0), binding(0)]] var<uniform> params : SimParams;
-      [[group(0), binding(1)]] var<storage, read> particlesSrc : Particles;
-      [[group(0), binding(2)]] var<storage, read_write> particlesDst : Particles;
+      @group(0) @binding(0) var<uniform> params : SimParams;
+      @group(0) @binding(1) var<storage, read> particlesSrc : array<Particle>;
+      @group(0) @binding(2) var<storage, read_write> particlesDst : array<Particle>;
       
       // https://github.com/austinEng/Project6-Vulkan-Flocking/blob/master/data/shaders/computeparticles/particle.comp
-      [[stage(compute), workgroup_size(64)]]
-      fn main([[builtin(global_invocation_id)]] global_invocation_id: vec3<u32>) {
-        let total = arrayLength(&particlesSrc.particles);
+      @compute
+      @workgroup_size(64)
+      fn main(@builtin(global_invocation_id) global_invocation_id: vec3<u32>) {
+        let total = arrayLength(&particlesSrc);
         let index = global_invocation_id.x;
         if (index >= total) {
           return;
         }
       
-        var vPos : vec2<f32> = particlesSrc.particles[index].pos;
-        var vVel : vec2<f32> = particlesSrc.particles[index].vel;
+        var vPos : vec2<f32> = particlesSrc[index].pos;
+        var vVel : vec2<f32> = particlesSrc[index].vel;
       
         var cMass : vec2<f32> = vec2<f32>(0.0, 0.0);
         var cVel : vec2<f32> = vec2<f32>(0.0, 0.0);
@@ -80,19 +77,19 @@ class Boids extends GPUWorld {
             continue;
           }
       
-          let pos = particlesSrc.particles[i].pos;
-          let vel = particlesSrc.particles[i].vel;
+          let pos = particlesSrc[i].pos;
+          let vel = particlesSrc[i].vel;
       
           if (distance(pos, vPos) < params.rule1Distance) {
-            cMass = cMass + pos;
-            cMassCount = cMassCount + 1;
+            cMass += pos;
+            cMassCount += 1;
           }
           if (distance(pos, vPos) < params.rule2Distance) {
-            colVel = colVel - (pos - vPos);
+            colVel -= pos - vPos;
           }
           if (distance(pos, vPos) < params.rule3Distance) {
-            cVel = cVel + vel;
-            cVelCount = cVelCount + 1;
+            cVel += vel;
+            cVelCount += 1;
           }
       
           continuing {
@@ -103,7 +100,7 @@ class Boids extends GPUWorld {
           cMass = cMass * (1.0 / f32(cMassCount)) - vPos;
         }
         if (cVelCount > 0) {
-          cVel = cVel * (1.0 / f32(cVelCount));
+          cVel *= 1.0 / f32(cVelCount);
         }
       
         vVel = vVel + (cMass * params.rule1Scale) +
@@ -114,7 +111,7 @@ class Boids extends GPUWorld {
         vVel = normalize(vVel) * clamp(length(vVel), 0.0, 0.1);
       
         // kinematic update
-        vPos = vPos + (vVel * params.deltaT);
+        vPos += vVel * params.deltaT;
       
         // Wrap around boundary
         if (vPos.x < -1.0) {
@@ -131,30 +128,30 @@ class Boids extends GPUWorld {
         }
       
         // Write back
-        particlesDst.particles[index].pos = vPos;
-        particlesDst.particles[index].vel = vVel;
+        particlesDst[index] = Particle(vPos, vVel);
       }`,
     });
 
     const drawShader = this.device.createShaderModule({
-      code: `[[stage(vertex)]]
-            fn main_vs(
-                [[location(0)]] particle_pos: vec2<f32>,
-                [[location(1)]] particle_vel: vec2<f32>,
-                [[location(2)]] position: vec2<f32>,
-            ) -> [[builtin(position)]] vec4<f32> {
-                let angle = -atan2(particle_vel.x, particle_vel.y);
-                let pos = vec2<f32>(
-                    position.x * cos(angle) - position.y * sin(angle),
-                    position.x * sin(angle) + position.y * cos(angle)
-                );
-                return vec4<f32>(pos + particle_pos, 0.0, 1.0);
-            }
-
-            [[stage(fragment)]]
-            fn main_fs() -> [[location(0)]] vec4<f32> {
-                return vec4<f32>(1.0, 1.0, 1.0, 1.0);
-            }`,
+      code: `
+      @vertex
+      fn main_vs(
+          @location(0) particle_pos: vec2<f32>,
+          @location(1) particle_vel: vec2<f32>,
+          @location(2) position: vec2<f32>,
+      ) -> @builtin(position) vec4<f32> {
+          let angle = -atan2(particle_vel.x, particle_vel.y);
+          let pos = vec2<f32>(
+              position.x * cos(angle) - position.y * sin(angle),
+              position.x * sin(angle) + position.y * cos(angle)
+          );
+          return vec4<f32>(pos + particle_pos, 0.0, 1.0);
+      }
+      
+      @fragment
+      fn main_fs() -> @location(0) vec4<f32> {
+          return vec4<f32>(1.0, 1.0, 1.0, 1.0);
+      }`,
     });
 
     const simParamData = new Float32Array([
@@ -323,10 +320,10 @@ class Boids extends GPUWorld {
     const computePass = encoder.beginComputePass();
     computePass.setPipeline(this.computePipeline);
     computePass.setBindGroup(0, this.particleBindGroups[this.frameNum % 2]);
-    computePass.dispatch(
+    computePass.dispatchWorkgroups(
       Math.ceil(this.particleCount / this.particlesPerGroup),
     );
-    computePass.endPass();
+    computePass.end();
     encoder.popDebugGroup();
 
     encoder.pushDebugGroup("render boids");
@@ -335,7 +332,7 @@ class Boids extends GPUWorld {
         {
           view: view,
           storeOp: "store",
-          loadValue: "load",
+          loadOp: "load",
         },
       ],
     });
@@ -346,7 +343,7 @@ class Boids extends GPUWorld {
     );
     renderPass.setVertexBuffer(1, this.verticesBuffer);
     renderPass.draw(3, this.particleCount);
-    renderPass.endPass();
+    renderPass.end();
     encoder.popDebugGroup();
 
     this.frameNum += 1;

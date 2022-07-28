@@ -1,3 +1,4 @@
+// deno-lint-ignore-file
 // Auto-generated with deno_bindgen
 import { CachePolicy, prepare } from "https://deno.land/x/plug@0.5.1/plug.ts";
 function encode(v: string | Uint8Array): Uint8Array {
@@ -7,7 +8,6 @@ function encode(v: string | Uint8Array): Uint8Array {
 function decode(v: Uint8Array): string {
   return new TextDecoder().decode(v);
 }
-// deno-lint-ignore no-explicit-any
 function readPointer(v: any): Uint8Array {
   const ptr = new Deno.UnsafePointerView(v);
   const lengthBe = new Uint8Array(4);
@@ -20,7 +20,6 @@ function readPointer(v: any): Uint8Array {
 const opts = {
   name: "neko",
   url: (new URL("../dist", import.meta.url)).toString(),
-  policy: CachePolicy.NONE,
 };
 const _lib = await prepare(opts, {
   menu_add_item: {

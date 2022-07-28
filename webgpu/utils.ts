@@ -18,7 +18,6 @@ export const getRowPadding = (width: number): Padding => {
   const paddedBytesPerRowPadding = (align - unpaddedBytesPerRow % align) %
     align;
   const paddedBytesPerRow = unpaddedBytesPerRow + paddedBytesPerRowPadding;
-
   return {
     unpadded: unpaddedBytesPerRow,
     padded: paddedBytesPerRow,
@@ -66,16 +65,16 @@ export function copyToBuffer(
   );
 }
 
-export function createBufferInit(
+export const createBufferInit = (
   device: GPUDevice,
   descriptor: BufferInit,
-): GPUBuffer {
+): GPUBuffer => {
   const contents = new Uint8Array(descriptor.contents);
-
-  const unpaddedSize = contents.byteLength;
-  const padding = 4 - unpaddedSize % 4;
-  const paddedSize = padding + unpaddedSize;
-
+  const alignMask = 4 - 1;
+  const paddedSize = Math.max(
+    (contents.byteLength + alignMask) & ~alignMask,
+    4,
+  );
   const buffer = device.createBuffer({
     label: descriptor.label,
     usage: descriptor.usage,
@@ -86,7 +85,7 @@ export function createBufferInit(
   data.set(contents);
   buffer.unmap();
   return buffer;
-}
+};
 
 // deno-fmt-ignore
 export const OPENGL_TO_WGPU_MATRIX = gmath.Matrix4.from(
@@ -96,11 +95,12 @@ export const OPENGL_TO_WGPU_MATRIX = gmath.Matrix4.from(
   0.0, 0.0, 0.5, 1.0,
 );
 
-export const setGPUBuffer = async (
+export async function setGPUBuffer(
   neko: Neko,
-  buffer: GPUBuffer,
+  _buffer: GPUBuffer,
   dimensions: Dimensions,
-): Promise<void> => {
+): Promise<void> {
+  const buffer = _buffer;
   await buffer.mapAsync(1);
   const inputBuffer = new Uint8Array(buffer.getMappedRange());
   const { padded, unpadded } = getRowPadding(dimensions.width);
@@ -115,4 +115,4 @@ export const setGPUBuffer = async (
   }
   neko.setFrameBuffer(outputBuffer);
   buffer.unmap();
-};
+}

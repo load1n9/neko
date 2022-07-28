@@ -1,7 +1,10 @@
 // ported from https://github.com/denoland/webgpu-examples/blob/main/cube/mod.ts
 import * as gmath from "https://deno.land/x/gmath@0.1.11/mod.ts";
-import { GPUWorld } from "../mod.ts";
-import { createBufferInit, OPENGL_TO_WGPU_MATRIX } from "../utils.ts";
+import { GPUWorld } from "https://deno.land/x/neko@1.1.0/webgpu/mod.ts";
+import {
+  createBufferInit,
+  OPENGL_TO_WGPU_MATRIX,
+} from "https://deno.land/x/neko@1.1.0/webgpu/utils.ts";
 
 const vertex = (
   pos: [number, number, number],
@@ -192,39 +195,38 @@ class Cube extends GPUWorld {
     const shader = this.device.createShaderModule({
       code: `
       struct VertexOutput {
-        [[location(0)]] tex_coord: vec2<f32>;
-        [[builtin(position)]] position: vec4<f32>;
+        @location(0) tex_coord: vec2<f32>,
+        @builtin(position) position: vec4<f32>,
     };
     
-    struct Locals {
-        transform: mat4x4<f32>;
-    };
-    [[group(0), binding(0)]]
-    var<uniform> r_locals: Locals;
+    @group(0)
+    @binding(0)
+    var<uniform> transform: mat4x4<f32>;
     
-    [[stage(vertex)]]
+    @vertex
     fn vs_main(
-        [[location(0)]] position: vec4<f32>,
-        [[location(1)]] tex_coord: vec2<f32>,
+        @location(0) position: vec4<f32>,
+        @location(1) tex_coord: vec2<f32>,
     ) -> VertexOutput {
-        var out: VertexOutput;
-        out.tex_coord = tex_coord;
-        out.position = r_locals.transform * position;
-        return out;
+        var result: VertexOutput;
+        result.tex_coord = tex_coord;
+        result.position = transform * position;
+        return result;
     }
     
-    [[group(0), binding(1)]]
+    @group(0)
+    @binding(1)
     var r_color: texture_2d<u32>;
     
-    [[stage(fragment)]]
-    fn fs_main(in: VertexOutput) -> [[location(0)]] vec4<f32> {
-        let tex = textureLoad(r_color, vec2<i32>(in.tex_coord * 256.0), 0);
+    @fragment
+    fn fs_main(vertex: VertexOutput) -> @location(0) vec4<f32> {
+        let tex = textureLoad(r_color, vec2<i32>(vertex.tex_coord * 256.0), 0);
         let v = f32(tex.x) / 255.0;
         return vec4<f32>(1.0 - (v * 5.0), 1.0 - (v * 15.0), 1.0 - (v * 50.0), 1.0);
     }
     
-    [[stage(fragment)]]
-    fn fs_wire() -> [[location(0)]] vec4<f32> {
+    @fragment
+    fn fs_wire(vertex: VertexOutput) -> @location(0) vec4<f32> {
         return vec4<f32>(0.0, 0.5, 0.0, 0.5);
     }`,
     });
@@ -274,7 +276,8 @@ class Cube extends GPUWorld {
         {
           view: view,
           storeOp: "store",
-          loadValue: [0.1, 0.2, 0.3, 1],
+          loadOp: "clear",
+          clearValue: [0.1, 0.2, 0.3, 1],
         },
       ],
     });
@@ -287,7 +290,7 @@ class Cube extends GPUWorld {
     renderPass.popDebugGroup();
     renderPass.insertDebugMarker("Draw!");
     renderPass.drawIndexed(this.indexCount, 1);
-    renderPass.endPass();
+    renderPass.end();
   }
 }
 

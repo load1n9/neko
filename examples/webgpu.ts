@@ -1,8 +1,12 @@
 // ported from https://github.com/denoland/webgpu-examples/blob/main/hello-triangle/mod.ts
 
-import { Neko, World } from "../mod.ts";
-import { copyToBuffer, createCapture, getRowPadding } from "../webgpu/utils.ts";
-import { Dimensions } from "../webgpu/types.ts";
+import { Neko, World } from "https://deno.land/x/neko@1.1.0/mod.ts";
+import {
+  copyToBuffer,
+  createCapture,
+  setGPUBuffer,
+} from "https://deno.land/x/neko@1.1.0/webgpu/utils.ts";
+import { Dimensions } from "https://deno.land/x/neko@1.1.0/webgpu/types.ts";
 
 const dimensions: Dimensions = {
   width: 200,
@@ -18,17 +22,18 @@ if (!device) {
 }
 
 const shaderCode = `
-  [[stage(vertex)]]
-  fn vs_main([[builtin(vertex_index)]] in_vertex_index: u32) -> [[builtin(position)]] vec4<f32> {
-      let x = f32(i32(in_vertex_index) - 1);
-      let y = f32(i32(in_vertex_index & 1u) * 2 - 1);
-      return vec4<f32>(x, y, 0.0, 1.0);
-  }
-  [[stage(fragment)]]
-  fn fs_main() -> [[location(0)]] vec4<f32> {
-      return vec4<f32>(1.0, 0.0, 0.0, 1.0);
-  }
-  `;
+@vertex
+fn vs_main(@builtin(vertex_index) in_vertex_index: u32) -> @builtin(position) vec4<f32> {
+    let x = f32(i32(in_vertex_index) - 1);
+    let y = f32(i32(in_vertex_index & 1u) * 2 - 1);
+    return vec4<f32>(x, y, 0.0, 1.0);
+}
+
+@fragment
+fn fs_main() -> @location(0) vec4<f32> {
+    return vec4<f32>(1.0, 0.0, 0.0, 1.0);
+}
+`;
 
 const shaderModule = device.createShaderModule({
   code: shaderCode,
@@ -53,27 +58,10 @@ const renderPipeline = device.createRenderPipeline({
       },
     ],
   },
+  primitive: {
+    topology: "triangle-list",
+  },
 });
-
-const { texture, outputBuffer: buf } = createCapture(device, dimensions);
-
-const encoder = device.createCommandEncoder();
-const renderPass = encoder.beginRenderPass({
-  colorAttachments: [
-    {
-      view: texture.createView(),
-      storeOp: "store",
-      loadValue: [0, 1, 0, 1],
-    },
-  ],
-});
-renderPass.setPipeline(renderPipeline);
-renderPass.draw(3, 1);
-renderPass.endPass();
-
-copyToBuffer(encoder, texture, buf, dimensions);
-
-device.queue.submit([encoder.finish()]);
 
 const neko = new Neko({
   ...dimensions,
@@ -82,20 +70,31 @@ const neko = new Neko({
 
 class Instance extends World {
   async update() {
-    await buf.mapAsync(1);
-    const inputBuffer = new Uint8Array(buf.getMappedRange());
-    const { padded, unpadded } = getRowPadding(dimensions.width);
-    const outputBuffer = new Uint8Array(unpadded * dimensions.height);
-
-    for (let i = 0; i < dimensions.height; i++) {
-      const slice = inputBuffer
-        .slice(i * padded, (i + 1) * padded)
-        .slice(0, unpadded);
-
-      outputBuffer.set(slice, i * unpadded);
+    if (!device) {
+      console.error("no suitable adapter found");
+      Deno.exit(0);
     }
-    neko.setFrameBuffer(outputBuffer);
-    buf.unmap();
+    const { texture, outputBuffer: buf } = createCapture(device, dimensions);
+
+    const encoder = device.createCommandEncoder();
+    const renderPass = encoder.beginRenderPass({
+      colorAttachments: [
+        {
+          view: texture.createView(),
+          storeOp: "store",
+          clearValue: { r: 0.0, g: 1.0, b: 0.0, a: 1.0 },
+          loadOp: "clear",
+        },
+      ],
+    });
+    renderPass.setPipeline(renderPipeline);
+    renderPass.draw(3, 1, 0, 0);
+    renderPass.end();
+
+    copyToBuffer(encoder, texture, buf, dimensions);
+
+    device.queue.submit([encoder.finish()]);
+    await setGPUBuffer(neko, buf, dimensions);
   }
 }
 await new Instance().start(neko, 60);
