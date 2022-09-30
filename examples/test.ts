@@ -1,4 +1,4 @@
-import { Menu, Neko, World } from "https://deno.land/x/neko@1.1.0/mod.ts";
+import { Menu, Neko, World } from "../mod.ts";
 
 const width = 800;
 const height = 600;

@@ -1,4 +1,3 @@
-// import { Plug } from "https://deno.land/x/plug@0.5.1/mod.ts";
 import { NekoOptions } from "./types.ts";
 import * as bindings from "../bindings/bindings.ts";
 import { unwrap, unwrapBoolean, wrapBoolean } from "./utils.ts";
@@ -11,8 +10,8 @@ export class Neko {
     this.height = options.height ?? 600;
     this.#id = bindings.window_new(
       options.title ?? "Neko",
-      this.width,
-      this.height,
+      BigInt(this.width),
+      BigInt(this.height),
       wrapBoolean(options.resize ?? false),
       wrapBoolean(options.borderless ?? false),
       wrapBoolean(
@@ -41,11 +40,11 @@ export class Neko {
   }
 
   setBackgroundColor(r: number, g: number, b: number) {
-    unwrap(bindings.window_set_background_color(this.#id, r, g, b));
+    unwrap(bindings.window_set_background_color(this.#id, BigInt(r), BigInt(g), BigInt(b)));
   }
 
   limitUpdateRate(micros: number) {
-    unwrap(bindings.window_limit_update_rate(this.#id, micros));
+    unwrap(bindings.window_limit_update_rate(this.#id, BigInt(micros)));
   }
 
   setFrameBuffer(buffer: Uint8Array, width?: number, height?: number) {
@@ -53,8 +52,8 @@ export class Neko {
       bindings.window_update_with_buffer(
         this.#id,
         buffer,
-        width ?? this.width,
-        height ?? this.height,
+        BigInt(width ?? this.width),
+        BigInt(height ?? this.height),
       ),
     );
   }

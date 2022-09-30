@@ -13,6 +13,7 @@ pub static SUCCESS: u32 = 0;
 pub static ERR_WINDOW_NOT_FOUND: u32 = 2;
 pub static ERR_UPDATE_WITH_BUFFER_FAILED: u32 = 3;
 
+
 thread_local! {
     static WINDOWS: RefCell<HashMap<u32, Window>> = RefCell::new(HashMap::new());
     static MENUS: RefCell<HashMap<u32,  Menu>> = RefCell::new(HashMap::new());

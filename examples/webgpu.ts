@@ -1,12 +1,12 @@
 // ported from https://github.com/denoland/webgpu-examples/blob/main/hello-triangle/mod.ts
 
-import { Neko, World } from "https://deno.land/x/neko@1.1.0/mod.ts";
+import { Neko, World } from "../mod.ts";
 import {
   copyToBuffer,
   createCapture,
   setGPUBuffer,
-} from "https://deno.land/x/neko@1.1.0/webgpu/utils.ts";
-import { Dimensions } from "https://deno.land/x/neko@1.1.0/webgpu/types.ts";
+} from "../webgpu/utils.ts";
+import { Dimensions } from "../webgpu/types.ts";
 
 const dimensions: Dimensions = {
   width: 200,
