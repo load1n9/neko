@@ -1,9 +1,9 @@
 import { Neko, World } from "../mod.ts";
-import { createCanvas } from "canvas/mod.ts";
+import { createCanvas } from "https://deno.land/x/canvas@v1.4.1/mod.ts";
 import type {
   CanvasRenderingContext2D,
   EmulatedCanvas2D,
-} from "canvas/mod.ts";
+} from "https://deno.land/x/canvas@v1.4.1/mod.ts";
 export interface Config {
   title?: string;
   width?: number;
@@ -56,10 +56,10 @@ export class Canvas {
 export {
   dataURLtoFile,
   loadImage,
-} from "canvas/mod.ts";
+} from "https://deno.land/x/canvas@v1.4.1/mod.ts";
 export type {
   CanvasImageData,
   CanvasImageSource,
   ImageBitmap,
   ImageData,
-} from "canvas/src/types.ts";
+} from "https://deno.land/x/canvas@v1.4.1/src/types.ts";
