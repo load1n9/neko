@@ -20,7 +20,10 @@ function readPointer(v: any): Uint8Array {
   return buf
 }
 
-const url = new URL("../dist", import.meta.url)
+const url = new URL(
+  "https://github.com/load1n9/neko/releases/download/1.1.3/",
+  import.meta.url,
+)
 let uri = url.toString()
 if (!uri.endsWith("/")) uri += "/"
 
@@ -42,7 +45,7 @@ const opts = {
     windows: uri + "neko.dll",
     linux: uri + "libneko.so",
   },
-  policy: CachePolicy.NONE,
+  policy: undefined,
 }
 const _lib = await prepare(opts, {
   menu_add_item: {

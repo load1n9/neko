@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    name: Build ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install rust
+        uses: hecrj/setup-rust-action@v1
+        with:
+          rust-version: nightly
+
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: canary
+
+      - name: Install deno_bindgen
+        run: deno install -Afq -n deno_bindgen https://deno.land/x/deno_bindgen/cli.ts
+
+      - name: Build
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          rustc --version
+          cargo --version
+          deno_bindgen --release=https://github.com/load1n9/neko/releases/download/1.1.3/"
+      - name: Release
+        uses: softprops/action-gh-release@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "release draft"
+          draft: true
+          files: |
+            target/release/libneko.so
+            target/release/libneko.dylib
+            target/release/neko.dll
