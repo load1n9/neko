@@ -34,7 +34,7 @@ jobs:
           set -xeuo pipefail
           rustc --version
           cargo --version
-          deno_bindgen --release=https://github.com/load1n9/neko/releases/download/1.1.3/"
+          deno_bindgen --release=https://github.com/load1n9/neko/releases/download/1.1.3/
       - name: Release
         uses: softprops/action-gh-release@master
         env:
